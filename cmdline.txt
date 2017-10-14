@@ -1,0 +1,44 @@
+curl http://localhost:4000
+docker run -p 4000:80 friendlyhello
+docker run -d -p 4000:80 friendlyhello
+docker tag friendlyhello stochmial/get-started:win-part2
+docker push stochmial/get-started:win-part2
+
+docker swarm init --advertise-addr eth1
+docker stack deploy -c docker-compose-step3.yml getstartedlab
+
+docker service ps getstartedlab_web
+
+docker stack rm getstartedlab
+docker swarm leave --force
+
+docker-machine create --driver virtualbox myvm1
+docker-machine create --driver virtualbox myvm2
+
+$ docker-machine ls
+NAME      ACTIVE   DRIVER       STATE     URL                         SWARM   DOCKER        ERRORS
+default   *        virtualbox   Running   tcp://192.168.99.100:2376           v17.09.0-ce
+myvm1     -        virtualbox   Running   tcp://192.168.99.101:2376           v17.09.0-ce
+myvm2     -        virtualbox   Running   tcp://192.168.99.102:2376           v17.09.0-ce
+
+docker-machine ssh myvm1 ifconfig
+
+$ docker-machine ssh myvm1 "docker swarm init --advertise-addr 192.168.99.101"
+Swarm initialized: current node (kjl0en4ml0o7t7gl8uk9un110) is now a manager.
+
+To add a worker to this swarm, run the following command:
+
+    docker swarm join --token SWMTKN-1-2x6tl23xlryys6ykw6uaxfvfvfa7nw5ii8kbpkrggz0lp9vhcn-dong3xjqyr9qj0qjmjzczm8uc 192.168.99.101:2377
+
+To add a manager to this swarm, run 'docker swarm join-token manager' and follow the instructions.
+
+
+$ docker-machine ssh myvm2 "docker swarm join \
+--token SWMTKN-1-2x6tl23xlryys6ykw6uaxfvfvfa7nw5ii8kbpkrggz0lp9vhcn-dong3xjqyr9qj0qjmjzczm8uc \
+192.168.99.101:2377"
+
+docker stack deploy -c docker-compose-step4.yml getstartedlab
+docker stack deploy -c docker-compose-step5.yml getstartedlab
+
+
+
